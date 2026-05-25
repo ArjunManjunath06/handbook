@@ -40,70 +40,22 @@ export async function POST(req: NextRequest) {
       hybrid: 'hybrid (mix of remote and in-office)',
     }[workArrangement]
 
-    const prompt = `You are an expert HR consultant and employment attorney. Create a comprehensive, professional employee handbook for the following company:
+    const systemPrompt = `You are an expert HR attorney and compliance specialist. Generate a complete, professional employee handbook for a US-based small business. The handbook must be legally compliant for the specified state. Include these sections: Welcome & Company Overview, At-Will Employment Statement, Equal Opportunity Employment, Anti-Harassment & Anti-Discrimination Policy (include state-specific requirements), Work Hours & Attendance, Compensation & Pay Periods, Benefits Overview, PTO & Leave Policy (include state-specific sick leave laws), Code of Conduct, Confidentiality Policy, Technology & Social Media Policy, Safety Policy, Discipline & Termination Procedures, and Acknowledgment Signature Page. Write in clear professional language a non-lawyer can understand. Customize every section for the company details provided.`
 
-Company Details:
-- Company Name: ${companyName}
-- State: ${state} (ensure all policies comply with ${state} state law)
-- Industry: ${industry}
-- Number of Employees: ${numEmployees}
-- Work Arrangement: ${workArrangementLabel}
-- Benefits Offered: ${benefitsList}
+    const userPrompt = `Generate a complete employee handbook for the following company:
 
-Generate a complete employee handbook that includes the following sections:
-
-1. Welcome Letter from Leadership
-2. Company Overview & Mission
-3. Employment Policies
-   - At-will employment statement (if applicable under ${state} law)
-   - Equal Employment Opportunity (EEO) policy
-   - Anti-harassment and anti-discrimination policy
-   - Background check policy
-4. Compensation & Pay Practices
-   - Pay schedules
-   - Overtime policy (compliant with ${state} and federal FLSA)
-   - Performance reviews
-5. Work Hours & Schedules
-   - Standard work hours appropriate for ${workArrangementLabel} arrangement
-   - Attendance and punctuality expectations
-   - Remote work / hybrid work guidelines (if applicable)
-6. Benefits
-   - Detailed description of each benefit: ${benefitsList}
-   - Eligibility requirements
-   - How to enroll
-7. Time Off Policies
-   - Vacation/PTO accrual (if PTO offered)
-   - Sick leave (compliant with ${state} sick leave laws)
-   - Holidays
-   - Leave of absence policies (FMLA, parental leave, etc.)
-8. Code of Conduct
-   - Professional standards
-   - Dress code appropriate for ${workArrangementLabel} environment
-   - Conflict of interest policy
-   - Confidentiality and data protection
-9. Technology & Equipment Use
-   - Acceptable use policy
-   - Social media guidelines
-   - Company equipment responsibility
-10. Health & Safety
-    - Workplace safety (OSHA compliance)
-    - Emergency procedures
-    - Workers' compensation
-11. Disciplinary Procedures
-    - Progressive discipline policy
-    - Grievance procedures
-12. Termination & Separation
-    - Voluntary resignation process
-    - Involuntary termination
-    - Final paycheck requirements under ${state} law
-13. Acknowledgment of Receipt (signature page)
-
-Make the handbook specific to ${companyName}, professional, legally sound for ${state}, and appropriately detailed for a ${numEmployees}-person ${industry} company. Use clear, accessible language. Format with proper headings and subheadings.`
+Company Name: ${companyName}
+State: ${state}
+Industry: ${industry}
+Number of Employees: ${numEmployees}
+Work Arrangement: ${workArrangementLabel}
+Benefits Offered: ${benefitsList}`
 
     const message = await client.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 8192,
-      messages: [{ role: 'user', content: prompt }],
+      system: systemPrompt,
+      messages: [{ role: 'user', content: userPrompt }],
     })
 
     const handbookText = message.content
